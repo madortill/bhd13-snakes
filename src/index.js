@@ -43,8 +43,6 @@ function initializeopeningPage() {
     currentSubjectNumber = 0;
     currentSubject = SUBJECTS[SUBJECTS_TITLES[currentSubjectNumber]];
     document.querySelector(".main").style.background = `var(${currentSubject["color-bg-opening"]})`;
-    document.querySelector(".page.opening .right-btn").addEventListener("click", updateSubAndDot);
-    document.querySelector(".page.opening .left-btn").addEventListener("click", updateSubAndDot);
     document.querySelector(".page.opening .start-btn").addEventListener("click", () => {
         chooseGroups(currentSubject);
     });
@@ -68,24 +66,6 @@ function changeSubject() {
     document.querySelector(".page.opening .block").style.background = `var(${currentSubject["color-bg"]})`;
 }
 
-//the function updates the current subject according to the pressed arrow 
-function updateSubAndDot(e) {
-    document.querySelector(`.page.opening .dot-${currentSubjectNumber}`).classList.remove("active");
-    // check if the pressed btn is the left one
-    if (e.target.classList.contains("left-btn")) {
-        currentSubjectNumber += 1;
-        if (currentSubjectNumber === 3)
-            currentSubjectNumber = 0;
-    }
-    else {
-        currentSubjectNumber -= 1;
-        if (currentSubjectNumber === -1)
-            currentSubjectNumber = 2;
-    }
-    currentSubject = SUBJECTS[SUBJECTS_TITLES[currentSubjectNumber]];
-    document.querySelector(`.page.opening .dot-${currentSubjectNumber}`).classList.add("active");
-    changeSubject();
-}
 
  // ------------------------- about ------------------------- 
 
@@ -147,7 +127,6 @@ function numGroups(e) {
     }
     numberOfGroups = e.target.innerHTML;
     e.target.classList.toggle("current");
-    console.log(numberOfGroups);
     createPartners();
 }
 
@@ -170,7 +149,7 @@ function getSwitch() {
             });
         }
     }
-    console.log(switchChoice);
+    // console.log(switchChoice);
 }
 
 function initializeChooseGroups() {
@@ -270,7 +249,7 @@ function instructions() {
 
 }
 
-// back to the page witch the players are choosing numbers of groups and names
+// back to the page whtich the players are choosing numbers of groups and names
 function backBtnChooseGroupFromIns() {
     document.querySelector(".page.instructions .back-btn").removeEventListener("click", backBtnChooseGroupFromIns);
     document.querySelector(".page.chooseGroups").classList.add("active");
@@ -288,8 +267,6 @@ function initializeCurrentTurnPage() {
     shuffle(questionArr);
     shuffle(missionArr);
     shuffle(newInfoArr);
-    console.log(missionArr);
-    console.log(newInfoArr);
 
     placePlayers();
 
@@ -565,6 +542,8 @@ function checkAnswer() {
         ans.removeEventListener("click", ansPressed);
     });
     document.querySelector(".page.question .check-btn").removeEventListener("click", checkAnswer);
+    let pageName = 'question';
+
 
     // checks if the current ans is correct
     if (currentAnswer === `ans${questionArr[currentQuestion].correctAns}`) {
@@ -574,8 +553,16 @@ function checkAnswer() {
     else {
         document.querySelector(".page.question .ans.checked").classList.add("mistake");
         document.querySelector(`.page.question .ans${questionArr[currentQuestion].correctAns}`).classList.add("real-ans");
-        document.querySelector(".page.question .feedback").innerHTML = "אוי.. כמעט שהצלחתם... החלקתם על הנחש לידכם ונפלתם אחורה...";
-        wrongAnswer();
+        slideDownSnake();
+
+        if (questionArr[currentQuestion].explanation) {
+            pageName = 'explanation';
+            document.querySelector(".page.question").classList.remove("active");
+            document.querySelector(".page.explanation").classList.add("active");
+            document.querySelector(".page.explanation .explain").innerHTML = `אוי.. כמעט שהצלחתם... החלקתם על הנחש לידכם ונפלתם אחורה... <br><br> <b>הסבר:</b> ${questionArr[currentQuestion].explanation}`;
+        } else {
+            document.querySelector(".page.question .feedback").innerHTML = "אוי.. כמעט שהצלחתם... החלקתם על הנחש לידכם ונפלתם אחורה...";
+        }
     }
 
     document.querySelector(".page.question .feedback").style.visibility = "visible";
@@ -583,14 +570,15 @@ function checkAnswer() {
         document.querySelector(".page.question .feedback").style.bottom = "0";
     }, 100);
 
-    document.querySelector(".page.question .check-btn").src = "../assets/images/buttons/next-btn.svg";
-    document.querySelector(".page.question .check-btn").addEventListener("click", nextTurnAfterQuestion);
+    document.querySelector(`.page.${pageName} .check-btn`).src = "../assets/images/buttons/next-btn.svg";
+    document.querySelector(`.page.${pageName} .check-btn`).addEventListener("click", nextTurnAfterQuestion);
 }
 
 // next turn of player + initialize pages to their current mode
 function nextTurnAfterQuestion() {
     initializeQuestion();
     document.querySelector(".page.question").classList.remove("active");
+    document.querySelector(".page.explanation").classList.remove("active");
     document.querySelector(".page.currentTurn").classList.add("active");
     currentPlayerNumber();
     currentPlayerTurn();
@@ -633,7 +621,7 @@ function currentQuestionNumber() {
         currentQuestion = 0;
 }
 
-function wrongAnswer() {
+function slideDownSnake() {
     console.log("המיקום הישן" + currPlayersPlaces[currentPlayer - 1]);
     let newPlace;
     let currPlcSign = MAP[currPlayersPlaces[currentPlayer - 1]];

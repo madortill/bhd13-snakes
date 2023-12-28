@@ -8,6 +8,7 @@
 }
 
 .page.question .btn,
+.page.explanation .btn,
 .page.mission .btn {
     height: 3.6rem;
     margin-top: 1rem;
@@ -30,7 +31,29 @@
     padding: 0.5rem 1rem;
     border: 6px solid rgb(142 255 133 / 0%);
 }
+/* explantion page */
+.page.explanation .ans {
+    background-color: white;
+    width: 70%;
+    border-radius: 1rem;
+    margin: 0.3rem;
+    transition: background-color, color, 0.2s ease-in-out;
+    font-size: 1.3rem;
+    padding: 1.7rem 1rem;
+    border: 6px solid rgb(142 255 133 / 0%);
+}
 
+.page.explanation .btn {
+    filter: drop-shadow(rgba(8, 8, 58, 0.192) 0px 2px 9px);
+}
+
+.page.explanation .container {
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* mission page */
 .page.mission .btns-container {
     display: flex;
     width: 86%;

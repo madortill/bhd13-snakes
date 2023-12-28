@@ -63,7 +63,7 @@
 .page.opening .choose-sub-container {
     display: flex;
     width: 90%;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-top: 0.8rem;
     z-index: 2;
