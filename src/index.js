@@ -559,7 +559,7 @@ function checkAnswer() {
             pageName = 'explanation';
             document.querySelector(".page.question").classList.remove("active");
             document.querySelector(".page.explanation").classList.add("active");
-            document.querySelector(".page.explanation .explain").innerHTML = `אוי.. כמעט שהצלחתם... החלקתם על הנחש לידכם ונפלתם אחורה... <br><br> <b>הסבר:</b> ${questionArr[currentQuestion].explanation}`;
+            document.querySelector(".page.explanation .explain").innerHTML = `אוי.. כמעט שהצלחתם... החלקתם על הנחש לידכם ונפלתם אחורה... <br><br> ${questionArr[currentQuestion].explanation}`;
         } else {
             document.querySelector(".page.question .feedback").innerHTML = "אוי.. כמעט שהצלחתם... החלקתם על הנחש לידכם ונפלתם אחורה...";
         }
