@@ -20,6 +20,7 @@ var blArr = [];
 var playersPosMap = [];
 var countRows = [];
 var levels = [];
+var QuestionType = '';
 
 
 window.addEventListener("load", function () {
@@ -353,14 +354,14 @@ function message() {
         case "SH":
             document.querySelector(".page.currentTurn .mission-container .option.default").classList.remove("active");
             document.querySelector(".page.currentTurn .mission-container .option.question").classList.add("active");
-            document.querySelector(".page.currentTurn .mission-container .option.question .btn").addEventListener("click", questionBtn);
+            document.querySelector(".page.currentTurn .mission-container .option.question .btn").addEventListener("click", () => questionBtn('snake'));
             break;
 
         // LB + number = ladder bottom (example: LB4)
         case "LB":
             document.querySelector(".page.currentTurn .mission-container .option.default").classList.remove("active");
             document.querySelector(".page.currentTurn .mission-container .option.mission").classList.add("active");
-            document.querySelector(".page.currentTurn .mission-container .option.mission .btn").addEventListener("click", missionBtn);
+            document.querySelector(".page.currentTurn .mission-container .option.mission .btn").addEventListener("click", () => questionBtn('ladder'));
             break;
 
         // NI = new info 
@@ -402,22 +403,14 @@ function empty() {
 }
 
 // the current player's place is a question 
-function questionBtn() {
+function questionBtn(type) {
+    QuestionType = type;
+    console.log(QuestionType);
     document.querySelector(".page.currentTurn .mission-container .option.default").classList.add("active");
 
     document.querySelector(".page.currentTurn").classList.remove("active");
     document.querySelector(".page.question").classList.add("active");
     newQuestion();
-    document.querySelector(".page.currentTurn .cubes").addEventListener("click", rollDice);
-}
-
-// the current player's place is a mission 
-function missionBtn() {
-    document.querySelector(".page.currentTurn .mission-container .option.default").classList.add("active");
-
-    document.querySelector(".page.currentTurn").classList.remove("active");
-    document.querySelector(".page.mission").classList.add("active");
-    newMission();
     document.querySelector(".page.currentTurn .cubes").addEventListener("click", rollDice);
 }
 
@@ -548,20 +541,28 @@ function checkAnswer() {
     // checks if the current ans is correct
     if (currentAnswer === `ans${questionArr[currentQuestion].correctAns}`) {
         document.querySelector(".page.question .ans.checked").classList.add("correct");
-        document.querySelector(".page.question .feedback").innerHTML = "כל הכבוד! רואים שאתם שולטים בחומר. התחמקתם בהצלחה מהנחש!";
+        if (QuestionType === 'snake') {
+            document.querySelector(".page.question .feedback").innerHTML = "כל הכבוד! רואים שאתם שולטים בחומר. התחמקתם בהצלחה מהנחש!";
+        } else {
+            document.querySelector(".page.question .feedback").innerHTML = "כל הכבוד! רואים שאתם שולטים בחומר. עליתם בהצלחה בסולם!";
+            successMission();
+        }
     }
     else {
+        let failText = QuestionType === 'snake' ? "אוי.. כמעט שהצלחתם... החלקתם על הנחש לידכם ונפלתם אחורה...": "אוי.. כמעט שהצלחתם... נכשלתם במשימה ולא עליתם בסולם..."
         document.querySelector(".page.question .ans.checked").classList.add("mistake");
         document.querySelector(`.page.question .ans${questionArr[currentQuestion].correctAns}`).classList.add("real-ans");
-        slideDownSnake();
+        if (QuestionType === 'snake') {
+            slideDownSnake();
+        }
 
         if (questionArr[currentQuestion].explanation) {
             pageName = 'explanation';
             document.querySelector(".page.question").classList.remove("active");
             document.querySelector(".page.explanation").classList.add("active");
-            document.querySelector(".page.explanation .explain").innerHTML = `אוי.. כמעט שהצלחתם... החלקתם על הנחש לידכם ונפלתם אחורה... <br><br> ${questionArr[currentQuestion].explanation}`;
+            document.querySelector(".page.explanation .explain").innerHTML = `${failText} <br><br> ${questionArr[currentQuestion].explanation}`;
         } else {
-            document.querySelector(".page.question .feedback").innerHTML = "אוי.. כמעט שהצלחתם... החלקתם על הנחש לידכם ונפלתם אחורה...";
+            document.querySelector(".page.question .feedback").innerHTML = failText;
         }
     }
 
@@ -604,6 +605,7 @@ function initializeQuestion() {
     currentQuestionNumber();
 
     document.querySelector(".page.currentTurn .mission-container .option.question").classList.remove("active");
+    document.querySelector(".page.currentTurn .mission-container .option.mission").classList.remove("active");
 }
 
 // set the current number of players
@@ -639,74 +641,6 @@ function slideDownSnake() {
 // mission page
 // 
 // 
-
-function newMission() {
-    document.querySelector(".page.mission .success-btn").style.filter = currentSubject["filter-btn-color"];
-    document.querySelector(".page.mission .failure-btn").style.filter = currentSubject["filter-btn-color"];
-    document.querySelector(".page.mission .arrow-next-btn").style.filter = currentSubject["filter-btn-color"];
-    document.querySelector(".page.mission .bg-mission").style.filter = currentSubject["filter-bg-mission-and-questions"];
-
-    document.querySelector(".page.mission .animal-img").src = `../assets/images/animals/player${currentPlayer}.svg`;
-    document.querySelector(".page.mission .text").innerHTML = missionArr[currentMission];
-
-    // adds event listeners to the btns
-    document.querySelector(".page.mission .success-btn").addEventListener("click", successBtn);
-    document.querySelector(".page.mission .failure-btn").addEventListener("click", failureBtn);
-}
-
-function successBtn() {
-    successMission();
-    document.querySelector(".page.mission .arrow-next-btn").style.display = "block";
-    document.querySelector(".page.mission .success-btn").src = "../assets/images/buttons/success-clicked-btn.svg";
-    document.querySelector(".page.mission .success-btn").removeEventListener("click", successBtn);
-    document.querySelector(".page.mission .failure-btn").removeEventListener("click", failureBtn);
-    document.querySelector(".page.mission .arrow-next-btn").addEventListener("click", nextTurnAfterMission);
-
-
-    document.querySelector(".page.mission .feedback").style.visibility = "visible";
-    setTimeout(() => {
-        document.querySelector(".page.mission .feedback").style.bottom = "0";
-    }, 100);
-    document.querySelector(".page.mission .feedback").innerHTML = "כל הכבוד! רואים שאתם שולטים בחומר. עליתם בהצלחה בסולם!";
-}
-
-function failureBtn() {
-    document.querySelector(".page.mission .failure-btn").src = "../assets/images/buttons/failure-clicked-btn.svg";
-    document.querySelector(".page.mission .arrow-next-btn").style.display = "block";
-    document.querySelector(".page.mission .success-btn").removeEventListener("click", successBtn);
-    document.querySelector(".page.mission .failure-btn").removeEventListener("click", failureBtn);
-    document.querySelector(".page.mission .arrow-next-btn").addEventListener("click", nextTurnAfterMission);
-
-    document.querySelector(".page.mission .feedback").style.visibility = "visible";
-    setTimeout(() => {
-        document.querySelector(".page.mission .feedback").style.bottom = "0";
-    }, 100);
-    document.querySelector(".page.mission .feedback").innerHTML = "אוי.. כמעט שהצלחתם... נכשלתם במשימה ולא עליתם בסולם...";
-}
-
-function nextTurnAfterMission() {
-    initializeMission();
-    document.querySelector(".page.mission").classList.remove("active");
-    document.querySelector(".page.currentTurn").classList.add("active");
-    currentPlayerNumber();
-    currentPlayerTurn();
-}
-
-function initializeMission() {
-    currentMission++;
-    if (currentMission === missionArr.length)
-        currentMission = 0;
-    document.querySelector(".page.mission .failure-btn").src = "../assets/images/buttons/failure-btn.svg";
-    document.querySelector(".page.mission .success-btn").src = "../assets/images/buttons/success-btn.svg";
-
-    document.querySelector(".page.mission .feedback").style.visibility = "";
-    document.querySelector(".page.mission .feedback").style.bottom = "";
-
-    document.querySelector(".page.mission .arrow-next-btn").removeEventListener("click", nextTurnAfterMission);
-    document.querySelector(".page.mission .arrow-next-btn").style.display = "none";
-
-    document.querySelector(".page.currentTurn .mission-container .option.mission").classList.remove("active");
-}
 
 // chance the position of the player to the top of the current ladder 
 function successMission() {
