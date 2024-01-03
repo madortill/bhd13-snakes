@@ -260,13 +260,11 @@ function backBtnChooseGroupFromIns() {
 //  ------------------------ current turn page ------------------------
 function initializeCurrentTurnPage() {
     questionArr = DATA[SUBJECTS_TITLES[currentSubjectNumber]].questions;
-    missionArr = DATA[SUBJECTS_TITLES[currentSubjectNumber]].missions[`${switchChoice}`];
     newInfoArr = DATA[SUBJECTS_TITLES[currentSubjectNumber]].newInfo;
     currentQuestion = 0;
     currentMission = 0;
     currentNewInfo = 0;
     shuffle(questionArr);
-    shuffle(missionArr);
     shuffle(newInfoArr);
 
     placePlayers();
