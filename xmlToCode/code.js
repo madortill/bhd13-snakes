@@ -16,7 +16,7 @@ xhttp.onreadystatechange = function() {
     }
 };
 
-xhttp.open("GET", "./הכנסת מידע ללומדת סולמות וחבלים.xml", true);
+xhttp.open("GET", "./realData.xml", true);
 xhttp.send();
 
 
@@ -24,6 +24,9 @@ const parseXML = () => {
     const parser = new DOMParser();
     xmlDoc = parser.parseFromString(xml,"text/xml");
     slidesList = evaluateXPath('//sld', xmlDoc, 'orderedArray');
+    if (slidesList.length === 0) {
+        console.error("Please use a formatter on the xml file (alt+shift+f)")
+    }
     let type;
     for (slide of slidesList) {
         type = findSlideType(slide);
@@ -33,7 +36,9 @@ const parseXML = () => {
     }
     // print 
     console.log(newSubjData);
-    document.getElementById('final-data').innerText = JSON.stringify(newSubjData, space = 10)
+    navigator.clipboard.writeText(JSON.stringify(newSubjData));
+    alert('הועתק ללוח');
+    document.getElementById('final-data').innerText = JSON.stringify(newSubjData)
 
 }
 
@@ -59,16 +64,21 @@ var questionSlide = (slide) => {
     // get question by font
     question = evaluateXPath('.//r[.//latin[@typeface="Rubik SemiBold"]]', slide);
     textQuestion = getTxtFromEl(question[0]);
-    //  create new question object
+    // create new question object
     newSubjData.questions.push({});
     newSubjData.questions[questionIndex].question = textQuestion;
     // get answers by the shape they are inside, and it's background color
-    answers = evaluateXPath('.//sp[.//spPr/solidFill/schemeClr[@val="bg1"] and .//spPr/prstGeom[@prst = "roundRect"]]//r', slide)
+    let answers = evaluateXPath('.//sp[.//spPr/solidFill/schemeClr[@val="lt1"] and .//spPr/prstGeom[@prst = "roundRect"]]//r', slide)
+    
+    // filter empty answers
+    answers = answers.filter((item) => {
+        return getTxtFromEl(item) !== " " && getTxtFromEl(item).length > 0;
+    })
+    // answers = evaluateXPath('.//sp[.//spPr[./prstGeom[@prst = "roundRect"]][./solidFill/schemeClr[@val="bg1"]]]//r', slide)
     saveAnswers(answers, questionIndex);
 
     // Add explanation if exist (find based on font and the word "הסבר")
     let explainationP = evaluateXPath('.//p[contains(., "הסבר")][.//latin[@typeface="Rubik"]]', slide);
-    console.log(explainationP)
     explainationP.forEach(item => {
         newSubjData.questions[questionIndex].explanation = getTxtFromEl(item)
     })
@@ -77,16 +87,18 @@ var questionSlide = (slide) => {
 let saveAnswers = (answers, questionIndex) => {
     // make sure there is the right amount of answers
     if (answers.length > 4) {
-        console.error('Too many possible answers. Change shape and font so relevant answers are in rounded rectangle with background color of #FFFFFF')
+        console.error(`Too many possible answers. Change shape and font so relevant answers are in rounded rectangle with background color of #FFFFFF in `)
+        printArray(answers);
     } else if (answers.length < 4) {
         console.error('Too few possible answers. Change shape and font so relevant answers are in rounded rectangle with background color of #FFFFFF')
+        console.log(answers);
     } else {
         //  save answers
         for (index in answers) {
-            newSubjData.questions[questionIndex][`ans${index}`] = getTxtFromEl(answers[index])
+            newSubjData.questions[questionIndex][`ans${Number(index) + 1}`] = getTxtFromEl(answers[index])
             // if the text is green - saves the answer as correct
-            if (document.evaluate('boolean(./rPr/solidFill/srgbClr[@val="00B050"])', slide, null, 3, null)) {
-                newSubjData.questions[questionIndex].correctAns = `ans${index}`;
+            if (document.evaluate('boolean(./rPr/solidFill/srgbClr[@val="00B050"])', answers[index], null, 3, null).booleanValue) {
+                newSubjData.questions[questionIndex].correctAns = `${Number(index) + 1}`;
             }
         }
     }
@@ -103,7 +115,7 @@ var missionSlide = (slide) => {
 }
 
 var infoSlide = (slide) => {
-    let infoList = evaluateXPath('.//p[.//latin[@typeface="Rubik"]]', slide);
+    let infoList = evaluateXPath('.//txBody[.//latin[@typeface="Rubik"]]', slide);
     for (info of infoList) {
         //  make  sure the title does not slip in
         if (!getTxtFromEl(info).includes('הכנסת מידע')) {
