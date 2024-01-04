@@ -107,7 +107,7 @@
 
 .page.mission .animal-img,
 .page.new-info .animal-img {
-    height: 13rem;
+    height: 12rem;
 }
 
 .page.mission .title {
@@ -141,7 +141,9 @@
 .page.mission .text,
 .page.new-info .text {
     margin: 0.5rem 2.7rem 1rem;
-    font-size: 1.35rem;
+    font-size: 1.2rem;
+    max-height: 52%;
+    overflow: auto;
 }
 
 .page.new-info .next-btn {
