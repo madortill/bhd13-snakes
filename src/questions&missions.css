@@ -78,7 +78,7 @@
 }
 
 .page.question .question {
-    margin: 2.5rem 2.5rem 1rem;
+    margin: 2.5rem 2.1rem 1rem;    
     font-size: 1.35rem;
 }
 
@@ -149,4 +149,9 @@
 .page.new-info .next-btn {
     height: 3.6rem;
     margin-top: 1rem;
+}
+
+.no-ans4 {
+    display: none !important;
+    pointer-events: none;
 }

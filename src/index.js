@@ -502,7 +502,11 @@ function newQuestion() {
     document.querySelector(".page.question .ans1").innerHTML = questionArr[currentQuestion].ans1;
     document.querySelector(".page.question .ans2").innerHTML = questionArr[currentQuestion].ans2;
     document.querySelector(".page.question .ans3").innerHTML = questionArr[currentQuestion].ans3;
-    document.querySelector(".page.question .ans4").innerHTML = questionArr[currentQuestion].ans4;
+    if (questionArr[currentQuestion].ans4 !== undefined) {
+        document.querySelector(".page.question .ans4").innerHTML = questionArr[currentQuestion].ans4;
+    } else {
+        document.querySelector(".page.question .ans4").classList.add('no-ans4');
+    }
 
     // adds event listeners to the answers
     document.querySelectorAll(".page.question .ans").forEach((ans) => {
@@ -575,6 +579,7 @@ function checkAnswer() {
 
 // next turn of player + initialize pages to their current mode
 function nextTurnAfterQuestion() {
+    document.querySelector(".page.question .ans4").classList.remove('no-ans4');
     initializeQuestion();
     document.querySelector(".page.question").classList.remove("active");
     document.querySelector(".page.explanation").classList.remove("active");
